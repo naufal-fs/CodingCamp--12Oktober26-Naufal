@@ -1,249 +1,411 @@
 /* ============================================================
    Life Dashboard — style.css
-   Single CSS file. Light mode is the default; dark mode is
-   applied via [data-theme="dark"] on the <html> element.
+   Blue theme with glassmorphism & asymmetric layout.
+   Single CSS file. No external dependencies.
    ============================================================ */
 
-/* ---------- Reset / base ---------- */
-* {
+/* ---------- CSS Variables ---------- */
+:root {
+  --bg-from:       #0a1628;
+  --bg-mid:        #0d2244;
+  --bg-to:         #0ea5e9;
+
+  --accent:        #3b82f6;
+  --accent-light:  #60a5fa;
+  --accent-sky:    #0ea5e9;
+  --accent-glow:   rgba(59, 130, 246, 0.35);
+
+  --card-bg:       #ffffff;
+  --card-border:   rgba(59, 130, 246, 0.15);
+  --card-shadow:   0 8px 32px rgba(10, 22, 40, 0.18);
+
+  --text-primary:  #0f172a;
+  --text-secondary:#475569;
+  --text-muted:    #94a3b8;
+
+  --input-bg:      #f1f5f9;
+  --input-border:  #cbd5e1;
+
+  --danger:        #ef4444;
+  --success:       #22c55e;
+
+  --radius-card:   18px;
+  --radius-btn:    10px;
+  --radius-input:  10px;
+
+  --transition:    all 0.2s ease;
+}
+
+/* ---------- Dark Mode ---------- */
+[data-theme="dark"] {
+  --card-bg:       rgba(15, 23, 42, 0.75);
+  --card-border:   rgba(59, 130, 246, 0.25);
+  --card-shadow:   0 8px 32px rgba(0, 0, 0, 0.45);
+
+  --text-primary:  #e2e8f0;
+  --text-secondary:#94a3b8;
+  --text-muted:    #64748b;
+
+  --input-bg:      rgba(30, 41, 59, 0.8);
+  --input-border:  rgba(59, 130, 246, 0.3);
+}
+
+[data-theme="dark"] body {
+  background: linear-gradient(135deg, #020617 0%, #0a1628 50%, #0d2a4a 100%);
+}
+
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   min-height: 100vh;
-  /* Purple (left) fading to blue (right) gradient background */
-  background: linear-gradient(135deg, #7b5ea7 0%, #5b7fd4 100%);
-  color: #333;
-  padding-bottom: 24px;
+  background: linear-gradient(135deg, var(--bg-from) 0%, var(--bg-mid) 55%, var(--bg-to) 100%);
+  background-attachment: fixed;
+  padding: 24px 20px 40px;
+  color: var(--text-primary);
 }
 
-/* Dark mode: darken the gradient background and base text color */
-[data-theme="dark"] body {
-  background: linear-gradient(135deg, #3a2a5e 0%, #1f2a52 100%);
-  color: #eee;
-}
-
-/* ---------- Theme toggle button (top-right, fixed) ---------- */
+/* ---------- Theme Toggle (pill switch, fixed top-right) ---------- */
 .theme-toggle {
   position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 10;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: none;
+  top: 18px;
+  right: 20px;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50px;
+  padding: 8px 16px;
+  font-size: 1.1rem;
   cursor: pointer;
-  font-size: 1.2rem;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  transition: background 0.15s, box-shadow 0.15s;
+  transition: var(--transition);
+  color: #fff;
+}
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
 }
 
-[data-theme="dark"] .theme-toggle {
-  background: #2d2d3d;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-}
-
-/* ---------- Grid layout ---------- */
+/* ---------- Dashboard Grid ---------- */
 .dashboard {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 24px;
   display: grid;
-  gap: 20px;
-  grid-template-columns: 1fr 1fr;
+  /* Asymmetric: tasks wider on left, timer+links stack on right */
+  grid-template-columns: 1.3fr 1fr;
+  grid-template-rows: auto 1fr auto;
   grid-template-areas:
-    "greeting greeting"
-    "timer tasks"
-    "links tasks";
+    "greeting  greeting"
+    "tasks     timer"
+    "tasks     links";
+  gap: 20px;
 }
 
-.card-greeting { grid-area: greeting; }
-.card-timer   { grid-area: timer; }
-.card-tasks   { grid-area: tasks; }
-.card-links   { grid-area: links; }
-
-/* ---------- Cards ---------- */
+/* ---------- Card Base ---------- */
 .card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  padding: 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow);
+  padding: 26px 28px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  /* Subtle colored top border */
+  border-top: 3px solid var(--accent);
+  /* Glassmorphism for dark mode */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(10, 22, 40, 0.22);
 }
 
-[data-theme="dark"] .card {
-  background: #2d2d3d;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+.card-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 18px;
 }
 
-/* ---------- Greeting / clock typography ---------- */
-.clock {
-  font-size: 3rem;
-  font-weight: bold;
-  color: #6c63ff;
+/* ---------- Card: Greeting (glassmorphism) ---------- */
+.card-greeting {
+  grid-area: greeting;
   text-align: center;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-top: 3px solid transparent;
+  /* Animated gradient top border via background-origin trick */
+  position: relative;
+  overflow: hidden;
 }
 
-[data-theme="dark"] .clock {
-  color: #9d8fff;
+/* Animated gradient top-border glow */
+.card-greeting::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #0ea5e9, #60a5fa, #3b82f6);
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+
+[data-theme="dark"] .card-greeting {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Clock */
+.clock {
+  font-size: 3.8rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  /* Blue gradient text */
+  background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.4));
+  margin-bottom: 6px;
 }
 
 .date {
-  font-size: 1rem;
-  color: #666;
-  text-align: center;
-  margin-top: 4px;
-}
-
-[data-theme="dark"] .date {
-  color: #aaa;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
 }
 
 .greeting {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: #333;
-  text-align: center;
-  margin-top: 8px;
-}
-
-[data-theme="dark"] .greeting {
-  color: #eee;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .edit-name-btn {
-  background: transparent;
+  background: none;
   border: none;
   cursor: pointer;
   font-size: 1rem;
-  vertical-align: middle;
-  margin-left: 6px;
-  opacity: 0.7;
+  opacity: 0.6;
+  transition: var(--transition);
+  padding: 2px 4px;
+  border-radius: 6px;
 }
-
 .edit-name-btn:hover {
   opacity: 1;
+  background: rgba(59, 130, 246, 0.1);
 }
 
-/* ---------- Card titles ---------- */
-.card-title {
-  font-size: 1.1rem;
-  font-weight: bold;
-  margin-bottom: 16px;
-  color: #333;
+/* ---------- Card: Tasks (left, spans 2 rows) ---------- */
+.card-tasks {
+  grid-area: tasks;
+  display: flex;
+  flex-direction: column;
 }
 
-[data-theme="dark"] .card-title {
-  color: #eee;
-}
-
-/* ---------- Buttons ---------- */
-.btn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-size: 0.95rem;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-}
-
-.btn-primary {
-  background: #6c63ff;
-  color: #fff;
-}
-
-.btn-primary:hover {
-  background: #5a52e0;
-}
-
-.btn-outline {
-  background: #fff;
-  border: 1px solid #ccc;
-  color: #333;
-}
-
-.btn-outline:hover {
-  background: #f3f3f7;
-}
-
-[data-theme="dark"] .btn-outline {
-  background: transparent;
-  border-color: #555;
-  color: #eee;
-}
-
-[data-theme="dark"] .btn-outline:hover {
-  border-color: #888;
-}
-
-.btn-small {
-  padding: 6px 10px;
-  font-size: 0.85rem;
-}
-
-.btn-danger {
-  background: #ef4444;
-  color: #fff;
-}
-
-.btn-danger:hover {
-  background: #dc2626;
-}
-
-/* ---------- Inputs / selects ---------- */
-input[type="text"],
-input[type="number"],
-select {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  background: #fff;
-  color: #333;
-}
-
-input[type="text"]:focus,
-input[type="number"]:focus,
-select:focus {
-  border-color: #6c63ff;
-  outline: none;
-}
-
-[data-theme="dark"] input[type="text"],
-[data-theme="dark"] input[type="number"],
-[data-theme="dark"] select {
-  background: #1e1e2e;
-  border-color: #444;
-  color: #eee;
-}
-
-.task-input-row,
-.link-input-row {
+.task-input-row {
   display: flex;
   gap: 8px;
   margin-bottom: 8px;
 }
 
-.task-input-row input,
-.link-input-row input {
+.task-error {
+  font-size: 0.8rem;
+  color: var(--danger);
+  min-height: 18px;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.task-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.task-toolbar select {
+  font-size: 0.82rem;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.task-list {
+  list-style: none;
   flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 360px;
+  padding-right: 4px;
 }
 
-/* ---------- Focus timer ---------- */
-.timer-display {
-  font-size: 3rem;
-  font-weight: bold;
-  color: #6c63ff;
+/* Scrollbar styling */
+.task-list::-webkit-scrollbar { width: 5px; }
+.task-list::-webkit-scrollbar-track { background: transparent; }
+.task-list::-webkit-scrollbar-thumb { background: var(--accent-light); border-radius: 10px; }
+
+/* Task pill item */
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-left: 4px solid var(--accent);
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition: var(--transition);
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.task-item:hover {
+  border-color: var(--accent-light);
+  box-shadow: 0 2px 10px var(--accent-glow);
+}
+
+/* Done state */
+.task-item.done {
+  border-left-color: var(--success);
+  opacity: 0.65;
+}
+.task-item.done .task-text {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.task-item input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.task-text {
+  flex: 1;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  outline: none;
+  border-radius: 4px;
+  padding: 2px 4px;
+  cursor: text;
+  word-break: break-word;
+}
+.task-text:focus {
+  background: rgba(59, 130, 246, 0.08);
+  outline: 1px solid var(--accent-light);
+}
+
+.task-delete {
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 4px 6px;
+  border-radius: 6px;
+  opacity: 0.7;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+.task-delete:hover {
+  opacity: 1;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ---------- Card: Focus Timer (top-right) ---------- */
+.card-timer {
+  grid-area: timer;
   text-align: center;
-  margin: 8px 0 16px;
 }
 
-[data-theme="dark"] .timer-display {
-  color: #9d8fff;
+.timer-ring-wrap {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timer-ring {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.timer-ring-bg {
+  fill: none;
+  stroke: rgba(59, 130, 246, 0.12);
+  stroke-width: 8;
+}
+
+.timer-ring-fg {
+  fill: none;
+  stroke: url(#ringGrad);
+  stroke-width: 8;
+  stroke-linecap: round;
+  /* Static decorative ring — 90% arc */
+  stroke-dasharray: 339.3;
+  stroke-dashoffset: 34;
+  transform-origin: center;
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 0 6px rgba(59,130,246,0.6));
+}
+
+/* Gradient def lives in SVG via defs — colors pulled from CSS fallback */
+
+.timer-display {
+  position: relative;
+  z-index: 1;
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 10px rgba(59,130,246,0.5));
 }
 
 .timer-controls {
@@ -258,148 +420,174 @@ select:focus {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
 }
+
+.timer-duration input[type="number"] {
+  width: 52px;
+  text-align: center;
+  font-size: 0.85rem;
+  padding: 5px 6px;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-primary);
+}
+
+/* Hide number spinner arrows */
+.timer-duration input[type="number"]::-webkit-inner-spin-button,
+.timer-duration input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 
 .btn-duration {
-  width: 32px;
-  height: 32px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
   border-radius: 8px;
-  border: 1px solid #ccc;
-  background: #fff;
-  cursor: pointer;
+  width: 30px;
+  height: 30px;
   font-size: 1.1rem;
-  color: #333;
-}
-
-.btn-duration:hover {
-  background: #f3f3f7;
-}
-
-[data-theme="dark"] .btn-duration {
-  background: #1e1e2e;
-  border-color: #555;
-  color: #eee;
-}
-
-#timerMinutes {
-  width: 64px;
-  text-align: center;
-}
-
-/* ---------- Tasks ---------- */
-.task-error {
-  color: #ef4444;
-  font-size: 0.85rem;
-  min-height: 1.1em; /* prevents layout jump when empty */
-  margin-bottom: 8px;
-}
-
-.task-toolbar {
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 700;
+  transition: var(--transition);
   display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 12px;
-  font-size: 0.9rem;
-}
-
-.task-list {
-  list-style: none;
-  max-height: 280px;
-  overflow-y: auto;
-}
-
-.task-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
-}
-
-[data-theme="dark"] .task-item {
-  border-bottom-color: #3a3a4a;
-}
-
-.task-item input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-.task-text {
-  flex: 1;
-  cursor: pointer;
-  outline: none;
-}
-
-/* Done tasks: strikethrough + grayed text */
-.task-item.done .task-text {
-  text-decoration: line-through;
-  color: #999;
-}
-
-[data-theme="dark"] .task-item.done .task-text {
-  color: #666;
-}
-
-.task-delete {
-  background: transparent;
-  border: none;
-  color: #ef4444;
-  cursor: pointer;
-  font-size: 1.1rem;
-  padding: 0 4px;
-}
-
-.task-delete:hover {
-  color: #dc2626;
-}
-
-/* ---------- Quick links ---------- */
-.link-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.link-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: #6c63ff;
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-
-.link-button:hover {
-  background: #5a52e0;
-}
-
-.link-remove {
-  background: rgba(255, 255, 255, 0.25);
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  line-height: 1;
-  font-size: 0.8rem;
-  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
-
-.link-remove:hover {
-  background: rgba(255, 255, 255, 0.45);
+.btn-duration:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
 }
 
-/* ---------- Responsive (single column under 640px) ---------- */
-@media (max-width: 640px) {
+/* ---------- Card: Quick Links (bottom-right) ---------- */
+.card-links {
+  grid-area: links;
+}
+
+.link-input-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.link-input-row input {
+  flex: 1;
+  min-width: 80px;
+}
+
+.link-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Link chip buttons */
+.link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 50px;
+  background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(14,165,233,0.12));
+  border: 1px solid rgba(59,130,246,0.3);
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.link-button:hover {
+  background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(59,130,246,0.4);
+  transform: translateY(-1px);
+}
+
+.link-remove {
+  background: none;
+  border: none;
+  color: currentColor;
+  cursor: pointer;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  padding: 0 2px;
+  transition: var(--transition);
+  line-height: 1;
+}
+.link-remove:hover { opacity: 1; }
+
+/* ---------- Buttons (shared) ---------- */
+input[type="text"],
+input[type="number"],
+select {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-input);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: inherit;
+  padding: 9px 13px;
+  transition: var(--transition);
+  outline: none;
+  width: 100%;
+}
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: var(--radius-btn);
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb, #0284c7);
+  box-shadow: 0 5px 16px rgba(59, 130, 246, 0.5);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--input-border);
+}
+.btn-outline:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(59, 130, 246, 0.06);
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
+/* ---------- Responsive (single column on narrow screens) ---------- */
+@media (max-width: 680px) {
   .dashboard {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -409,8 +597,18 @@ select:focus {
       "links";
   }
 
-  .task-input-row,
-  .link-input-row {
-    flex-wrap: wrap;
+  .card-tasks {
+    max-height: none;
+  }
+
+  .task-list {
+    max-height: 280px;
+  }
+
+  .clock {
+    font-size: 2.8rem;
   }
 }
+
+/* ---------- SVG gradient definition (inline fallback) ---------- */
+/* The SVG in index.html defines linearGradient#ringGrad for the arc stroke */

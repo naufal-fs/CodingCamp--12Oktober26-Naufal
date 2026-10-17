@@ -21,10 +21,22 @@
       </h1>
     </section>
 
-    <!-- 2. FOCUS TIMER — bottom-left card -->
+    <!-- 2. FOCUS TIMER — top-right card -->
     <section class="card card-timer">
       <h2 class="card-title">Focus Timer</h2>
-      <div class="timer-display" id="timerDisplay">25:00</div>
+      <div class="timer-ring-wrap">
+        <svg class="timer-ring" viewBox="0 0 120 120" aria-hidden="true">
+          <defs>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#3b82f6"/>
+              <stop offset="100%" stop-color="#0ea5e9"/>
+            </linearGradient>
+          </defs>
+          <circle class="timer-ring-bg" cx="60" cy="60" r="54"></circle>
+          <circle class="timer-ring-fg" cx="60" cy="60" r="54"></circle>
+        </svg>
+        <div class="timer-display" id="timerDisplay">25:00</div>
+      </div>
       <div class="timer-controls">
         <button id="timerStart" class="btn btn-primary">Start</button>
         <button id="timerStop" class="btn btn-outline">Stop</button>
@@ -39,7 +51,7 @@
       </div>
     </section>
 
-    <!-- 3. TASKS — bottom-right card (spans two rows) -->
+    <!-- 3. TASKS — left, tall (spans two rows) -->
     <section class="card card-tasks">
       <h2 class="card-title">Tasks</h2>
       <div class="task-input-row">
@@ -58,7 +70,7 @@
       <ul class="task-list" id="taskList"></ul>
     </section>
 
-    <!-- 4. QUICK LINKS — below Focus Timer -->
+    <!-- 4. QUICK LINKS — bottom-right card -->
     <section class="card card-links">
       <h2 class="card-title">Quick Links</h2>
       <div class="link-input-row">
