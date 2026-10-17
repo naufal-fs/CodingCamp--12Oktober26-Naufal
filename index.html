@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Life Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Dark mode toggle (top-right, fixed) -->
+  <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+
+  <main class="dashboard">
+    <!-- 1. GREETING — full width top card -->
+    <section class="card card-greeting">
+      <div class="clock" id="clock">00:00:00</div>
+      <div class="date" id="date">—</div>
+      <h1 class="greeting">
+        <span id="greetingText">Good Morning!</span>
+        <button id="editNameBtn" class="edit-name-btn" title="Edit your name" aria-label="Edit your name">✏️</button>
+      </h1>
+    </section>
+
+    <!-- 2. FOCUS TIMER — bottom-left card -->
+    <section class="card card-timer">
+      <h2 class="card-title">Focus Timer</h2>
+      <div class="timer-display" id="timerDisplay">25:00</div>
+      <div class="timer-controls">
+        <button id="timerStart" class="btn btn-primary">Start</button>
+        <button id="timerStop" class="btn btn-outline">Stop</button>
+        <button id="timerReset" class="btn btn-outline">Reset</button>
+      </div>
+      <div class="timer-duration">
+        <label for="timerMinutes">Minutes</label>
+        <button id="minutesDec" class="btn-duration" aria-label="Decrease minutes">−</button>
+        <input type="number" id="timerMinutes" min="1" max="120" value="25" />
+        <button id="minutesInc" class="btn-duration" aria-label="Increase minutes">+</button>
+        <button id="applyMinutes" class="btn btn-outline btn-small">Apply</button>
+      </div>
+    </section>
+
+    <!-- 3. TASKS — bottom-right card (spans two rows) -->
+    <section class="card card-tasks">
+      <h2 class="card-title">Tasks</h2>
+      <div class="task-input-row">
+        <input type="text" id="taskInput" placeholder="Add a new task..." />
+        <button id="taskAdd" class="btn btn-primary">Add</button>
+      </div>
+      <div class="task-error" id="taskError" role="alert"></div>
+      <div class="task-toolbar">
+        <label for="sortSelect">Sort:</label>
+        <select id="sortSelect">
+          <option value="manual">Manual</option>
+          <option value="alpha">Alphabetical (A–Z)</option>
+          <option value="status">By status (done last)</option>
+        </select>
+      </div>
+      <ul class="task-list" id="taskList"></ul>
+    </section>
+
+    <!-- 4. QUICK LINKS — below Focus Timer -->
+    <section class="card card-links">
+      <h2 class="card-title">Quick Links</h2>
+      <div class="link-input-row">
+        <input type="text" id="linkName" placeholder="Link name" />
+        <input type="text" id="linkUrl" placeholder="URL" />
+        <button id="linkAdd" class="btn btn-primary">Add Link</button>
+      </div>
+      <div class="link-list" id="linkList"></div>
+    </section>
+  </main>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
